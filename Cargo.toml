@@ -1,0 +1,10 @@
+[package]
+name = "bastion"
+version = "0.1.0"
+edition = "2021"
+authors = ["Alexander Hansen <alex@bitzmc.com>"]
+
+[profile.release]
+strip = true
+opt-level = "z"
+panic = "abort"
