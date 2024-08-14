@@ -4,7 +4,17 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Alexander Hansen <alex@bitzmc.com>"]
 
+[dependencies]
+thiserror = "1.0.63"
+
+[lib]
+name = "bastion"
+path = "src/lib.rs"
+
 [profile.release]
 strip = true
 opt-level = "z"
 panic = "abort"
+
+[workspace]
+members = ["cli"]
