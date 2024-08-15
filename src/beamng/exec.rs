@@ -1,20 +1,24 @@
 use std::path::PathBuf;
 use std::process::Command;
 
-use super::args;
+use super::{args, BeamNGInstall};
 
 const DEFAULT_STEAM_EXEC: &str = "steam";
 const BEAMNG_STEAM_ID: &str = "284160";
 const WINDOWS_EXEC_PATH: &str = "Bin64/BeamNG.drive.x64.exe";
+const WINDOWS_LAUNCHER_EXEC_PATH: &str = "BeamNG.drive.exe";
 
 pub enum ExecMethod {
     Steam {
         steam_path: Option<PathBuf>,
     },
     Windows {
-        install: super::BeamNGInstall,
+        install: BeamNGInstall,
         args: args::CommonArgs,
     },
+    WindowsIndirect {
+        install: BeamNGInstall,
+    }
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -52,6 +56,20 @@ pub fn exec(method: ExecMethod) -> Result<(), ExecError> {
             let mut command = Command::new("cmd.exe");
             command.args(["/C", &exec_path.to_string_lossy()]);
             command.args(args.to_args());
+
+            command.status().map_err(ExecError::ProcessFailed)?;
+        }
+        ExecMethod::WindowsIndirect { install } => {
+            let exec_path = install.path.join(WINDOWS_LAUNCHER_EXEC_PATH);
+
+            if !exec_path.exists() {
+                return Err(ExecError::FileNotFound(exec_path));
+            } else if exec_path.is_dir() {
+                return Err(ExecError::DirectoryAtExecutable(exec_path));
+            }
+
+            let mut command = Command::new("cmd.exe");
+            command.args(["/C", &exec_path.to_string_lossy()]);
 
             command.status().map_err(ExecError::ProcessFailed)?;
         }

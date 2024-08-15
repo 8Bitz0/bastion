@@ -19,10 +19,12 @@ pub enum Commands {
 
 #[derive(Debug, Subcommand)]
 pub enum RunMethod {
+    /// Opens the game using Steam. No game arguments are supported.
     Steam {
         /// Override the command to execute Steam
         steam_exec: Option<PathBuf>,
     },
+    /// Directly launches the game and passes requested arguments.
     Windows {
         /// Very root of the BeamNG.drive install
         install_path: PathBuf,
@@ -32,6 +34,11 @@ pub enum RunMethod {
         #[arg(long)]
         /// Override game graphics API
         gfx_api: Option<String>,
+    },
+    /// Opens the game's launcher. No game arguments are supported.
+    WindowsIndirect {
+        /// Very root of the BeamNG.drive install
+        install_path: PathBuf,
     },
 }
 
@@ -66,6 +73,24 @@ fn main() {
                 let args = CommonArgs { console, gfx_api };
 
                 match exec(ExecMethod::Windows { install, args }) {
+                    Ok(()) => {}
+                    Err(e) => {
+                        eprintln!("BeamNG.drive process failed: {e}");
+                        std::process::exit(1);
+                    }
+                }
+            }
+            RunMethod::WindowsIndirect {
+                install_path,
+            } => {
+                let install = BeamNGInstall::init(install_path);
+
+                if !install.exists() {
+                    eprintln!("Given install does not exist.");
+                    std::process::exit(1);
+                }
+
+                match exec(ExecMethod::WindowsIndirect { install }) {
                     Ok(()) => {}
                     Err(e) => {
                         eprintln!("BeamNG.drive process failed: {e}");
