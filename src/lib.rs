@@ -1,3 +1,3 @@
 mod beamng;
 
-pub use beamng::{exec, BeamNGInstall, CommonArgs, ExecError, ExecMethod};
+pub use beamng::{exec, BeamNGInstall, CommonArgs, ExecError, ExecMethod, LinuxArgs};

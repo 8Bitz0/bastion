@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 mod args;
 mod exec;
 
-pub use args::CommonArgs;
+pub use args::{CommonArgs, LinuxArgs};
 pub use exec::{exec, ExecError, ExecMethod};
 
 #[derive(Debug, Clone)]

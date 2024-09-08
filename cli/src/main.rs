@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
-use bastion::{exec, BeamNGInstall, CommonArgs, ExecMethod};
+use bastion::{exec, BeamNGInstall, CommonArgs, ExecMethod, LinuxArgs};
 
 #[derive(Debug, Parser)]
 pub struct Args {
@@ -39,6 +39,14 @@ pub enum RunMethod {
     WindowsIndirect {
         /// Very root of the BeamNG.drive install
         install_path: PathBuf,
+    },
+    /// Directly launches the game using the Linux binary and passes requested arguments.
+    Linux {
+        /// Very root of the BeamNG.drive install
+        install_path: PathBuf,
+        #[arg(long, short = 'c')]
+        /// Override game graphics API
+        gfx_api: Option<String>,
     },
 }
 
@@ -91,6 +99,27 @@ fn main() {
                 }
 
                 match exec(ExecMethod::WindowsIndirect { install }) {
+                    Ok(()) => {}
+                    Err(e) => {
+                        eprintln!("BeamNG.drive process failed: {e}");
+                        std::process::exit(1);
+                    }
+                }
+            }
+            RunMethod::Linux {
+                install_path,
+                gfx_api,
+            } => {
+                let install = BeamNGInstall::init(install_path);
+
+                if !install.exists() {
+                    eprintln!("Given install does not exist.");
+                    std::process::exit(1);
+                }
+
+                let args = LinuxArgs { gfx_api };
+
+                match exec(ExecMethod::Linux { install, args }) {
                     Ok(()) => {}
                     Err(e) => {
                         eprintln!("BeamNG.drive process failed: {e}");

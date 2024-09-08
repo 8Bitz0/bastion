@@ -6,6 +6,13 @@ pub struct CommonArgs {
     // pub vehicle: Option<String>,
 }
 
+#[derive(Debug, Clone)]
+pub struct LinuxArgs {
+    pub gfx_api: Option<String>,
+    // pub level: Option<String>,
+    // pub vehicle: Option<String>,
+}
+
 impl CommonArgs {
     pub fn to_args(&self) -> Vec<String> {
         let mut a: Vec<String> = vec![];
@@ -13,6 +20,19 @@ impl CommonArgs {
         if self.console {
             a.push("-console".to_string())
         };
+        if let Some(gfx_api) = &self.gfx_api {
+            a.push("-gfx".to_string());
+            a.push(gfx_api.to_string())
+        };
+
+        a
+    }
+}
+
+impl LinuxArgs {
+    pub fn to_args(&self) -> Vec<String> {
+        let mut a: Vec<String> = vec![];
+
         if let Some(gfx_api) = &self.gfx_api {
             a.push("-gfx".to_string());
             a.push(gfx_api.to_string())
