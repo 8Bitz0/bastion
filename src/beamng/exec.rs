@@ -8,6 +8,7 @@ const BEAMNG_STEAM_ID: &str = "284160";
 const WINDOWS_EXEC_PATH: &str = "Bin64/BeamNG.drive.x64.exe";
 const LINUX_EXEC_PATH: &str = "BinLinux/BeamNG.drive.x64";
 const WINDOWS_LAUNCHER_EXEC_PATH: &str = "BeamNG.drive.exe";
+const APPLE_GPTK_WINE_PATH: &str = "Contents/Resources/wine/bin/wine";
 
 pub enum ExecMethod {
     Steam {
@@ -23,6 +24,15 @@ pub enum ExecMethod {
     Linux {
         install: BeamNGInstall,
         args: args::LinuxArgs,
+    },
+    MacGPTK {
+        install: BeamNGInstall,
+        args: args::CommonArgs,
+        gptk_path: PathBuf,
+    },
+    MacGPTKIndirect {
+        install: BeamNGInstall,
+        gptk_path: PathBuf,
     },
 }
 
@@ -89,6 +99,39 @@ pub fn exec(method: ExecMethod) -> Result<(), ExecError> {
 
             let mut command = Command::new(&exec_path);
             command.args(args.to_args());
+
+            command.status().map_err(ExecError::ProcessFailed)?;
+        }
+        ExecMethod::MacGPTK { install, args, gptk_path } => {
+            let exec_path = install.path.join(WINDOWS_EXEC_PATH);
+
+            if !exec_path.exists() {
+                return Err(ExecError::FileNotFound(exec_path));
+            } else if exec_path.is_dir() {
+                return Err(ExecError::DirectoryAtExecutable(exec_path));
+            }
+
+            let gptk_wine_path = gptk_path.join(APPLE_GPTK_WINE_PATH);
+
+            let mut command = Command::new(&gptk_wine_path);
+            command.arg(exec_path.to_string_lossy().as_ref());
+            command.args(args.to_args());
+
+            command.status().map_err(ExecError::ProcessFailed)?;
+        }
+        ExecMethod::MacGPTKIndirect { install, gptk_path } => {
+            let exec_path = install.path.join(WINDOWS_LAUNCHER_EXEC_PATH);
+
+            if !exec_path.exists() {
+                return Err(ExecError::FileNotFound(exec_path));
+            } else if exec_path.is_dir() {
+                return Err(ExecError::DirectoryAtExecutable(exec_path));
+            }
+
+            let gptk_wine_path = gptk_path.join(APPLE_GPTK_WINE_PATH);
+
+            let mut command = Command::new(&gptk_wine_path);
+            command.arg(exec_path.to_string_lossy().as_ref());
 
             command.status().map_err(ExecError::ProcessFailed)?;
         }
