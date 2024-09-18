@@ -5,8 +5,8 @@ use super::{args, BeamNGInstall};
 
 const DEFAULT_STEAM_EXEC: &str = "steam";
 const BEAMNG_STEAM_ID: &str = "284160";
-const WINDOWS_EXEC_PATH: &str = "Bin64/BeamNG.drive.x64.exe";
-const LINUX_EXEC_PATH: &str = "BinLinux/BeamNG.drive.x64";
+const WINDOWS_EXEC_PATH: &str = "Bin64/BeamNG.x64.exe";
+const LINUX_EXEC_PATH: &str = "BinLinux/BeamNG.x64";
 const WINDOWS_LAUNCHER_EXEC_PATH: &str = "BeamNG.drive.exe";
 const APPLE_GPTK_WINE_PATH: &str = "Contents/Resources/wine/bin/wine";
 
